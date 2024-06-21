@@ -2,5 +2,5 @@
 *.zip
 **/build
 **/opencv-4.x
-output.txt
-output2.txt
+*output.txt
+*output2.txt
