@@ -14,61 +14,16 @@ inline float_double distance_arr(float_double range0, float_double range3, float
 __device__
 //inline float_double distance_arr_2(/*char* data,*/ const char* rangedata, point3d x, gaussian_kernel2_3D* kernels){
 inline float_double distance_arr_2(const range_data* rangedata, point3d x, gaussian_kernel2_3D* kernels){
-    #if max_leaf_size == 1
-        /*if (((array_indexes_type*)data)[0] == 0){
-            array_indexes_type start = ((array_indexes_type*)data)[1];
-            return (kernels)[start].distance(x);
-        }*/
-    #endif
-    /*point3d projection;
-    float_double range0 = ((float_double*)rangedata)[0];
-    float_double range3 = ((float_double*)rangedata)[3];
-    projection.x = min(max(x.x, range0), range3);
-    float_double range1 = ((float_double*)rangedata)[1];
-    float_double range4 = ((float_double*)rangedata)[4];
-    projection.y = min(max(x.y, range1), range4);
-    float_double range2 = ((float_double*)rangedata)[2];
-    float_double range5 = ((float_double*)rangedata)[5];
-    projection.z = min(max(x.z, range2), range5);
-    float_double dist = x.square_distance(projection);
-    float_double range6 = ((float_double*)rangedata)[6];
-    float_double range7 = ((float_double*)rangedata)[7];
-    float_double d1_ = (range6 - dist/(2*range7*range7));
-    float_double d1  = -(max(d1_, negligeable_val_when_exp));
-    return d1;*/
     float_double dist = 0;
-    /*float_double range0 = ((float_double*)rangedata)[0];
-    float_double range3 = ((float_double*)rangedata)[3];
-    float_double temp = min(max(x.x, range0), range3)-x.x;*/
-    //float_double temp = min(max(x.x, ((float_double*)rangedata)[0]), ((float_double*)rangedata)[3])-x.x;
     float_double temp = min(max(x.x, rangedata->range0), rangedata->range3)-x.x;
     dist+= temp*temp;
-    /*float_double range1 = ((float_double*)rangedata)[1];
-    float_double range4 = ((float_double*)rangedata)[4];
-    float_double temp2 = min(max(x.y, range1), range4)-x.y;*/
-    //float_double temp2 = min(max(x.y, ((float_double*)rangedata)[1]), ((float_double*)rangedata)[4])-x.y;
     float_double temp2 = min(max(x.y, rangedata->range1), rangedata->range4)-x.y;
     dist+= temp2*temp2;
-    /*float_double range2 = ((float_double*)rangedata)[2];
-    float_double range5 = ((float_double*)rangedata)[5];
-    float_double temp3 = min(max(x.z, range2), range5)-x.z;*/
-    //float_double temp3 = min(max(x.z, ((float_double*)rangedata)[2]), ((float_double*)rangedata)[5])-x.z;
     float_double temp3 = min(max(x.z, rangedata->range2), rangedata->range5)-x.z;
     dist+= temp3*temp3;
-    /*float_double range6 = ((float_double*)rangedata)[6];
-    float_double range7 = ((float_double*)rangedata)[7];
-    float_double d1_ = (range6 - dist/(2*range7*range7));*/
-    //float_double d1_ = (((float_double*)rangedata)[6] - dist/(2*((float_double*)rangedata)[7]*((float_double*)rangedata)[7]));
     float_double d1_ = (rangedata->range6 - dist/(2*rangedata->range7*rangedata->range7));
     float_double d1  = -(max(d1_, negligeable_val_when_exp));
     return d1;
-    /*float_double temp0= min(max(x.x, ((float_double*)rangedata)[0]), ((float_double*)rangedata)[3])-x.x;
-    float_double temp1= min(max(x.y, ((float_double*)rangedata)[1]), ((float_double*)rangedata)[4])-x.y;
-    float_double temp2= min(max(x.z, ((float_double*)rangedata)[2]), ((float_double*)rangedata)[5])-x.z;
-    float_double temp3= norm3d(temp0, temp1, temp2);
-    return -(max((((float_double*)rangedata)[6] - (temp3*temp3)/(2*((float_double*)rangedata)[7]*((float_double*)rangedata)[7])), negligeable_val_when_exp));
-    */
-
 }
 __device__
 inline float_double distance_arr_3_left(const node* n, point3d x, gaussian_kernel2_3D* kernels){

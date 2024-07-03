@@ -28,7 +28,18 @@
 #define K_knn 20
 
 #define Size_point_block 2
+#ifdef _USE_CUDA_ 
 
+#else
+   template <typename T>
+   inline T max(T a, T b){
+       return std::max(a, b);
+   }
+    template <typename T>
+    inline T min(T a, T b){
+         return std::min(a, b);
+    }
+#endif
 
 #ifdef _USE_CUDA_ 
 __host__ __device__
@@ -589,7 +600,11 @@ gaussian_kernel2_3D{
         array_indexes_type end;
     };
 #else
-    struct __align__(16) leaf{
+    struct 
+    #ifdef _USE_CUDA_
+        __align__(16)
+    #endif
+    leaf{
         array_indexes_type is_leaf;
         array_indexes_type start;
     };
@@ -605,7 +620,11 @@ struct range_data{
     float_double range7;
 };
 
-struct __align__(16) node{
+struct 
+#ifdef _USE_CUDA_
+    __align__(16)
+#endif
+    node{
     array_indexes_type right;
     range_data left_range;
     range_data right_range;

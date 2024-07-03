@@ -19,3 +19,5 @@ void random_scale(float_double* s){
         s[i] = 2*((float_double)rand()/(float_double)RAND_MAX)-1;
     }
 }
+
+

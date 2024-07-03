@@ -1,69 +1,37 @@
-float_double distance_arr_2(/*char* data,*/ char* rangedata, point3d x, std::vector<gaussian_kernel2_3D>* kernels){
-    /*if (((array_indexes_type*)data)[0] == 0){
-        array_indexes_type start = ((array_indexes_type*)data)[1];
-        return (*kernels)[start].distance(x);
-    }*/
-    point3d projection;
-    projection.x = x.x;
-    projection.y = x.y;
-    projection.z = x.z;
-    float_double range0 = ((float_double*)rangedata)[0];
-    if (x.x < range0){
-        projection.x = range0;
-    }
-    else{float_double range3 = ((float_double*)rangedata)[3];
-        if (x.x > range3){
-            projection.x = range3;
-        }
-    }
-    float_double range1 = ((float_double*)rangedata)[1];
-    if (x.y < range1){
-        projection.y = range1;
-    }
-    
-    else{float_double range4 = ((float_double*)rangedata)[4];
-        if (x.y > range4){
-            projection.y = range4;
-        }
-    }
-    float_double range2 = ((float_double*)rangedata)[2];
-    if (x.z < range2){
-        projection.z = range2;
-    }
-    else{float_double range5 = ((float_double*)rangedata)[5];
-        if (x.z > range5){
-            projection.z = range5;
-        }
-    }
-    float_double dist = x.square_distance(projection);
-    float_double range6 = ((float_double*)rangedata)[6];
-    float_double range7 = ((float_double*)rangedata)[7];
-    float_double d1_ = (range6 - dist/(2*range7*range7));
-    float_double d1  = -(std::max(d1_, negligeable_val_when_exp));
+float_double distance_arr_2(const range_data rangedata, point3d x, std::vector<gaussian_kernel2_3D>* kernels){
+    float_double dist = 0;
+    float_double temp = min(max(x.x, rangedata.range0), rangedata.range3)-x.x;
+    dist+= temp*temp;
+    float_double temp2 = min(max(x.y, rangedata.range1), rangedata.range4)-x.y;
+    dist+= temp2*temp2;
+    float_double temp3 = min(max(x.z, rangedata.range2), rangedata.range5)-x.z;
+    dist+= temp3*temp3;
+    float_double d1_ = (rangedata.range6 - dist/(2*rangedata.range7*rangedata.range7));
+    float_double d1  = -(max(d1_, negligeable_val_when_exp));
     return d1;
 }
-void search1nn_arr_non_rec(char*data, point3d x, gaussian_kernel2_3D* res,float_double* min_dist_, std::vector<gaussian_kernel2_3D>* kernels){
+void search1nn_arr_non_rec(leaf* data, point3d x, gaussian_kernel2_3D* res,float_double* min_dist_, std::vector<gaussian_kernel2_3D>* kernels){
     //std::cout << "search1nn_arr_non_rec" << std::endl;
     float_double min_dist = *min_dist_;
     array_indexes_type best = max_array_indexes_type;
-    std::stack<char*> stack_pointer;
+    std::stack<leaf*> stack_pointer;
     std::stack<float_double> stack_dist;
     stack_pointer.push(data);
     stack_dist.push(std::numeric_limits<float_double>::min());
     while(!stack_pointer.empty()){
-        char* current_data = stack_pointer.top();
+        leaf* current_data = stack_pointer.top();
         stack_pointer.pop();
         float_double current_dist = stack_dist.top();
         stack_dist.pop();
         if(current_dist < min_dist){
-            if (((array_indexes_type*)current_data)[0] == 0){
-                array_indexes_type start = ((array_indexes_type*)current_data)[1];
+            if (current_data->is_leaf == 0){
+                array_indexes_type start = current_data->start;
                 /*if ((*kernels)[start].distance(x) < min_dist){
                     best = start;
                     min_dist = (*kernels)[start].distance(x);
                 }*/
                 #if max_leaf_size > 1
-                    array_indexes_type end = ((array_indexes_type*)current_data)[2];
+                    array_indexes_type end = current_data->end;
                     //std::cout << "start: " << start << " end: " << end << std::endl;
                     for(array_indexes_type i = start; i <= end; i++){
                         if ((*kernels)[i].distance(x) < min_dist){
@@ -78,12 +46,17 @@ void search1nn_arr_non_rec(char*data, point3d x, gaussian_kernel2_3D* res,float_
                     }
                 #endif
             }else{
-                char* left_data = current_data + ((array_indexes_type*)current_data)[0];
+                const node* current_data_ = (node*)current_data;
+                /*char* left_data = current_data + ((array_indexes_type*)current_data)[0];
                 char* right_data = current_data + ((array_indexes_type*)(current_data+sizeof(array_indexes_type)+(3+3+1+1)*sizeof(float_double)))[0];
-                float_double dist_left = distance_arr_2(/*left_data,*/ current_data+sizeof(array_indexes_type), x, kernels);
-                float_double dist_right = distance_arr_2(/*right_data,*/ current_data+2*sizeof(array_indexes_type)+(3+3+1+1)*sizeof(float_double), x, kernels);
-                char* first;
-                char* second;
+                */
+                leaf* left_data = (leaf*)(((char *)current_data_) +  sizeof(node));
+                leaf* right_data = (leaf*)(((char *)current_data_) + current_data_ -> right);
+               
+                float_double dist_left = distance_arr_2(current_data_->left_range, x, kernels);
+                float_double dist_right = distance_arr_2((current_data_->right_range), x, kernels);
+                leaf* first;
+                leaf* second;
                 float_double dist_first;
                 float_double dist_second;
                 if (dist_left < dist_right){
@@ -115,22 +88,22 @@ void search1nn_arr_non_rec(char*data, point3d x, gaussian_kernel2_3D* res,float_
     *min_dist_ = min_dist;
     //std::cout << "search1nn_arr_non_rec end" << std::endl;
 }
-void search_knn_arr_non_rec(char*data, point3d x, float_double* min_dist_,gaussian_kernel2_3D** found, array_indexes_type k, array_indexes_type* number_found_, std::vector<gaussian_kernel2_3D>* kernels){
+void search_knn_arr_non_rec(leaf*data, point3d x, float_double* min_dist_,gaussian_kernel2_3D** found, array_indexes_type k, array_indexes_type* number_found_, std::vector<gaussian_kernel2_3D>* kernels){
     //std::cout << "search_knn_arr_non_rec" << std::endl;
     array_indexes_type number_found = *number_found_;
     float_double min_dist = *min_dist_;
-    std::stack<char*> stack_pointer;
+    std::stack<leaf*> stack_pointer;
     std::stack<float_double> stack_dist;
     stack_pointer.push(data);
     stack_dist.push(std::numeric_limits<float_double>::min());
     while(!stack_pointer.empty()){
-        char* current_data = stack_pointer.top();
+        leaf* current_data = stack_pointer.top();
         stack_pointer.pop();
         float_double current_dist = stack_dist.top();
         stack_dist.pop();
         if(current_dist < min_dist){
-            if (((array_indexes_type*)current_data)[0] == 0){
-                array_indexes_type start = ((array_indexes_type*)current_data)[1];
+            if (current_data->is_leaf == 0){
+                array_indexes_type start = current_data->start;
                 #if max_leaf_size == 1
                     if ((*kernels)[start].distance(x) < min_dist){
                         if (number_found == 0){
@@ -163,7 +136,7 @@ void search_knn_arr_non_rec(char*data, point3d x, float_double* min_dist_,gaussi
                         }
                     }
                 #else
-                    array_indexes_type end = ((array_indexes_type*)current_data)[2];
+                    array_indexes_type end = current_data->end;
                     for(array_indexes_type i = start; i <= end; i++){
                         //std::cout << "i: " << i << std::endl;
                         if ((*kernels)[i].distance(x) < min_dist){
@@ -210,12 +183,17 @@ void search_knn_arr_non_rec(char*data, point3d x, float_double* min_dist_,gaussi
                 #endif
                 //std::cout << "end: " << end << std::endl;
             }else{
-                char* left_data = current_data + ((array_indexes_type*)current_data)[0];
+                const node* current_data_ = (node*)current_data;
+                /*char* left_data = current_data + ((array_indexes_type*)current_data)[0];
                 char* right_data = current_data + ((array_indexes_type*)(current_data+sizeof(array_indexes_type)+(3+3+1+1)*sizeof(float_double)))[0];
-                float_double dist_left = distance_arr_2(/*left_data,*/ current_data+sizeof(array_indexes_type), x, kernels);
-                float_double dist_right = distance_arr_2(/*right_data,*/ current_data+2*sizeof(array_indexes_type)+(3+3+1+1)*sizeof(float_double), x, kernels);
-                char* first;
-                char* second;
+                */
+                leaf* left_data = (leaf*)(((char *)current_data_) +  sizeof(node));
+                leaf* right_data = (leaf*)(((char *)current_data_) + current_data_ -> right);
+               
+                float_double dist_left = distance_arr_2(current_data_->left_range, x, kernels);
+                float_double dist_right = distance_arr_2((current_data_->right_range), x, kernels);
+                leaf* first;
+                leaf* second;
                 float_double dist_first;
                 float_double dist_second;
                 if (dist_left < dist_right){
@@ -254,10 +232,10 @@ class kd_tree3{
         kernels = ks;
     }
     void search_1nn(gaussian_kernel2_3D* res,point3d x,float_double* min_dist, size_t* debug_counter = nullptr){
-        search1nn_arr_non_rec(root->data, x, res, min_dist, kernels);
+        search1nn_arr_non_rec((leaf *) (root->data), x, res, min_dist, kernels);
     }
     void search_knn(point3d x, float_double* min_dist,gaussian_kernel2_3D** found, array_indexes_type k, array_indexes_type* number_found){
-        search_knn_arr_non_rec(root->data, x, min_dist, found, k, number_found, kernels);
+        search_knn_arr_non_rec((leaf *) (root->data), x, min_dist, found, k, number_found, kernels);
     }
     friend std::ostream& operator<<(std::ostream& os, const kd_tree3& k){
         os << "kd_tree(" << *k.root << ")";
