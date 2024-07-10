@@ -2,6 +2,7 @@
 #include "../construct_tree/construct.hpp"
 #include "../common_header.hpp"
 #include "def_functions.cuh"
+#define Sort
 int main(){
     int deviceCount;
     cudaGetDeviceCount(&deviceCount);
@@ -77,7 +78,7 @@ int main(){
     cudaMemcpy(tree3_data_GPU, tree3_data, root3.size, cudaMemcpyHostToDevice);
 
     //void search1nn_arr_non_rec(char*data, point3d* xs, gaussian_kernel2_3D* ress,float_double* min_dist_, gaussian_kernel2_3D* kernels, array_indexes_type n)
-    array_indexes_type N_points = 100000000;
+    array_indexes_type N_points = 100000;
     /*point3d* xs = (point3d*)malloc(N_points*sizeof(point3d));
     for(array_indexes_type i=0;i<N_points;i++){
         xs[i].x = 1000*((float_double)rand()/(float_double)RAND_MAX);
@@ -94,18 +95,20 @@ int main(){
     }
     point3d mini = point3d(0,0,0);
     point3d maxi = point3d(1000,1000,1000);
-    std::cout << "start sort" << std::endl;
-    //std::sort(xs_.begin(), xs_.end(), [&](point3d a, point3d b) -> bool {return a.hilbert_curve_cord(mini, maxi) < b.hilbert_curve_cord(mini, maxi);});
-    std::vector<std::pair<point3d, double>> xs_hilbert;
-    for(array_indexes_type i=0;i<N_points;i++){
-        xs_hilbert.push_back(std::make_pair(xs_[i], xs_[i].hilbert_curve_cord(mini, maxi)));
-    }
-    std::cout << "start sort" << std::endl;
-    std::sort(xs_hilbert.begin(), xs_hilbert.end(), [&](std::pair<point3d, double> a, std::pair<point3d, double> b) -> bool {return a.second < b.second;});
-    std::cout << "end sort" << std::endl;
-    for(array_indexes_type i=0;i<N_points;i++){
-        xs_[i] = xs_hilbert[i].first;
-    }
+    #ifdef Sort
+        std::cout << "start sort" << std::endl;
+        //std::sort(xs_.begin(), xs_.end(), [&](point3d a, point3d b) -> bool {return a.hilbert_curve_cord(mini, maxi) < b.hilbert_curve_cord(mini, maxi);});
+        std::vector<std::pair<point3d, double>> xs_hilbert;
+        for(array_indexes_type i=0;i<N_points;i++){
+            xs_hilbert.push_back(std::make_pair(xs_[i], xs_[i].hilbert_curve_cord(mini, maxi)));
+        }
+        std::cout << "start sort" << std::endl;
+        std::sort(xs_hilbert.begin(), xs_hilbert.end(), [&](std::pair<point3d, double> a, std::pair<point3d, double> b) -> bool {return a.second < b.second;});
+        std::cout << "end sort" << std::endl;
+        for(array_indexes_type i=0;i<N_points;i++){
+            xs_[i] = xs_hilbert[i].first;
+        }
+    #endif
 
     /*std::sort(xs_.begin(), xs_.end(), [&](point3d a, point3d b) -> bool {
         float_double a_h = (a.x/1000)*100 + ((a.y/1000)*100)*100 + ((a.z/1000)*100)*100*100;
@@ -235,7 +238,7 @@ int main(){
     
 
 
-    std::cout << "Time for the search1nn_arr_non_rec: " << (float)(end-start)/CLOCKS_PER_SEC << std::endl;
+    std::cout << "Time for the search1nn_arr_non_rec random: " << (float)(end-start)/CLOCKS_PER_SEC << std::endl;
 
     //free the memory
     //free(tree3_data);
@@ -385,18 +388,20 @@ int main(){
         mu.z= min_coord3[2] + (max_coord3[2]-min_coord3[2])*((float_double)rand()/(float_double)RAND_MAX);
         xs__.push_back(mu);
     }
-    //std::sort(xs__.begin(), xs__.end(), [&](point3d a, point3d b) -> bool {return a.x < b.x;});
-    point3d min_ = point3d(min_coord3[0],min_coord3[1],min_coord3[2]);
-    point3d max_ = point3d(max_coord3[0],max_coord3[1],max_coord3[2]);
-    //std::sort(xs__.begin(), xs__.end(), [&](point3d a, point3d b) -> bool {return a.hilbert_curve_cord(min_, max_) < b.hilbert_curve_cord(min_, max_);});
-    std::vector<std::pair<point3d, double>> xs_hilbert_;
-    for(array_indexes_type i=0;i<N_points_;i++){
-        xs_hilbert_.push_back(std::make_pair(xs__[i], xs__[i].hilbert_curve_cord(min_, max_)));
-    }
-    std::sort(xs_hilbert_.begin(), xs_hilbert_.end(), [&](std::pair<point3d, double> a, std::pair<point3d, double> b) -> bool {return a.second < b.second;});
-    for(array_indexes_type i=0;i<N_points_;i++){
-        xs__[i] = xs_hilbert_[i].first;
-    }
+    #ifdef Sort
+        //std::sort(xs__.begin(), xs__.end(), [&](point3d a, point3d b) -> bool {return a.x < b.x;});
+        point3d min_ = point3d(min_coord3[0],min_coord3[1],min_coord3[2]);
+        point3d max_ = point3d(max_coord3[0],max_coord3[1],max_coord3[2]);
+        //std::sort(xs__.begin(), xs__.end(), [&](point3d a, point3d b) -> bool {return a.hilbert_curve_cord(min_, max_) < b.hilbert_curve_cord(min_, max_);});
+        std::vector<std::pair<point3d, double>> xs_hilbert_;
+        for(array_indexes_type i=0;i<N_points_;i++){
+            xs_hilbert_.push_back(std::make_pair(xs__[i], xs__[i].hilbert_curve_cord(min_, max_)));
+        }
+        std::sort(xs_hilbert_.begin(), xs_hilbert_.end(), [&](std::pair<point3d, double> a, std::pair<point3d, double> b) -> bool {return a.second < b.second;});
+        for(array_indexes_type i=0;i<N_points_;i++){
+            xs__[i] = xs_hilbert_[i].first;
+        }
+    #endif
     point3d* xs2_ = (point3d*)malloc(N_points_*sizeof(point3d));
     for(array_indexes_type i=0;i<N_points_;i++){
         xs2_[i] = xs__[i];
@@ -469,7 +474,7 @@ int main(){
     cudaFree(min_dist_GPU_);
     std::cout << "END of true test" << std::endl;
 
-/*
+    /*
     //test the brute force on gpu
     //void search1nn_brute_force(point3d* x, gaussian_kernel2_3D* ress, float_double* min_dist, gaussian_kernel2_3D* kernels, array_indexes_type n, array_indexes_type n_kernels)
     gaussian_kernel2_3D* ress_bf = (gaussian_kernel2_3D*)malloc(N_points_*sizeof(gaussian_kernel2_3D));
@@ -484,51 +489,54 @@ int main(){
     cudaMalloc(&min_dist_bf_GPU, sizeof(float_double)*N_points_);
     cudaMemcpy(min_dist_bf_GPU, min_dist_bf, sizeof(float_double)*N_points_, cudaMemcpyHostToDevice);
 
-    gaussian_kernel2_3D* kernels_bf = (gaussian_kernel2_3D*)malloc(count3*sizeof(gaussian_kernel2_3D));
-    for(array_indexes_type i=0;i<count3;i++){
-        kernels_bf[i] = kernels3_[i];
-    }
-    gaussian_kernel2_3D* kernels_bf_GPU;
-    cudaMalloc(&kernels_bf_GPU, count3*sizeof(gaussian_kernel2_3D));
-    cudaMemcpy(kernels_bf_GPU, kernels_bf, count3*sizeof(gaussian_kernel2_3D), cudaMemcpyHostToDevice);
-
-    point3d* xs_bf = (point3d*)malloc(N_points_*sizeof(point3d));
-    for(array_indexes_type i=0;i<N_points_;i++){
-        xs_bf[i].x = min_coord3[0] + (max_coord3[0]-min_coord3[0])*((float_double)rand()/(float_double)RAND_MAX);
-        xs_bf[i].y = min_coord3[1] + (max_coord3[1]-min_coord3[1])*((float_double)rand()/(float_double)RAND_MAX);
-        xs_bf[i].z = min_coord3[2] + (max_coord3[2]-min_coord3[2])*((float_double)rand()/(float_double)RAND_MAX);
-    }
-    point3d* xs_bf_GPU;
-    cudaMalloc(&xs_bf_GPU, N_points_*sizeof(point3d));
-    cudaMemcpy(xs_bf_GPU, xs_bf, N_points_*sizeof(point3d), cudaMemcpyHostToDevice);
-
     clock_t start__, end__;
     start__ = clock();
-    search1nn_brute_force<<<gridSize, blockSize>>>(xs_bf_GPU, ress_bf_GPU, min_dist_bf_GPU, kernels_bf_GPU, N_points_, count3);
+    search1nn_brute_force<<<gridSize, blockSize>>>(xs_GPU, ress_bf_GPU, min_dist_bf_GPU,kernels_GPU , N_points_, count3);
 
-    //search1nn_arr_non_rec<<<numBlocks, blockSize>>>(tree3_data_GPU, xs_GPU, ress_GPU, min_dist_GPU, kernels_GPU, N_points);
     cudaDeviceSynchronize();
     end__ = clock();
 
     cudaMemcpy(ress_bf, ress_bf_GPU, N_points_*sizeof(gaussian_kernel2_3D), cudaMemcpyDeviceToHost);
     cudaMemcpy(min_dist_bf, min_dist_bf_GPU, N_points_*sizeof(float_double), cudaMemcpyDeviceToHost);
+    cudaFree(ress_bf_GPU);
+    cudaFree(min_dist_bf_GPU);
 
     std::cout << "Gpu done" << std::endl;
-    std::cout << "Time for the search1nn_brute_force: " << (float)(end__-start__)/CLOCKS_PER_SEC << std::endl;
+    std::cout << "Time for the search1nn_brute_force random: " << (float)(end__-start__)/CLOCKS_PER_SEC << std::endl;
 
+    //test the brute force on gpu
+    //void search1nn_brute_force(point3d* x, gaussian_kernel2_3D* ress, float_double* min_dist, gaussian_kernel2_3D* kernels, array_indexes_type n, array_indexes_type n_kernels)
+    gaussian_kernel2_3D* ress_bf_ = (gaussian_kernel2_3D*)malloc(N_points_*sizeof(gaussian_kernel2_3D));
+    gaussian_kernel2_3D* ress_bf_GPU_;
+    cudaMalloc(&ress_bf_GPU_, N_points_*sizeof(gaussian_kernel2_3D));
 
-    //free the memory
-    free(xs_bf);
-    cudaFree(xs_bf_GPU);
-    free(ress_bf);
-    cudaFree(ress_bf_GPU);
-    free(min_dist_bf);
-    cudaFree(min_dist_bf_GPU);
-    free(kernels_bf);
-    cudaFree(kernels_bf_GPU);
+    float_double* min_dist_bf_ = (float_double*)malloc(sizeof(float_double)*N_points_);
+    for(array_indexes_type i=0;i<N_points_;i++){
+        min_dist_bf_[i] = max_float_double;
+    }
+    float_double* min_dist_bf_GPU_;
+    cudaMalloc(&min_dist_bf_GPU_, sizeof(float_double)*N_points_);
+    cudaMemcpy(min_dist_bf_GPU_, min_dist_bf_, sizeof(float_double)*N_points_, cudaMemcpyHostToDevice);
+
+    clock_t start___, end___;
+    start___ = clock();
+    search1nn_brute_force<<<gridSize, blockSize>>>(xs_GPU_, ress_bf_GPU_, min_dist_bf_GPU_,kernels_GPU_ , N_points_, count3);
+
+    cudaDeviceSynchronize();
+    end___ = clock();
+
+    cudaMemcpy(ress_bf_, ress_bf_GPU_, N_points_*sizeof(gaussian_kernel2_3D), cudaMemcpyDeviceToHost);
+    cudaMemcpy(min_dist_bf_, min_dist_bf_GPU_, N_points_*sizeof(float_double), cudaMemcpyDeviceToHost);
+
+    std::cout << "Gpu done" << std::endl;
+    std::cout << "Time for the search1nn_brute_force: " << (float)(end___-start___)/CLOCKS_PER_SEC << std::endl;
+
+    cudaFree(ress_bf_GPU_);
+    cudaFree(min_dist_bf_GPU_);
+
     std::cout << "END of brute force test" << std::endl;
+    */
 
-*/
 
 
     //test the kNN search
@@ -629,7 +637,7 @@ int main(){
         }
     }*/
 
-    std::cout << "Time for the search_knn_arr_non_rec: " << (float)(end___-start___)/CLOCKS_PER_SEC << std::endl;
+    std::cout << "Time for the search_knn_arr_non_rec random: " << (float)(end___-start___)/CLOCKS_PER_SEC << std::endl;
 
     //free the memory
     free(ress_knn);
@@ -815,7 +823,7 @@ int main(){
         }
     }*/
 
-    std::cout << "Time for the search1nn_arr_non_rec: " << (float)(end_____-start_____)/CLOCKS_PER_SEC << std::endl;
+    std::cout << "Time for the ssearch1nn_many_arr_non_rec random : " << (float)(end_____-start_____)/CLOCKS_PER_SEC << std::endl;
 
 
     //free the memory 
@@ -877,7 +885,7 @@ int main(){
         }
     }*/
 
-    std::cout << "Time for the search1nn_arr_non_rec: " << (float)(end______-start______)/CLOCKS_PER_SEC << std::endl;
+    std::cout << "Time for the search1nn_many_arr_non_rec: " << (float)(end______-start______)/CLOCKS_PER_SEC << std::endl;
 
 
 

@@ -398,10 +398,10 @@ point3d render_pixel_mix_block(rotation_matrix dir, point3d src, visual_gaussian
             T = T * (1- alpha);
         }*/
         //float_double eval = current_kernel.get_integral(0, INFINITY);
-        if(current_kernel.mu < 0){
+        /*if(current_kernel.mu < 0){
             continue;
-        }
-        float_double eval = current_kernel.get_integral(0, INFINITY);
+        }*/
+        float_double eval = current_kernel.get_integral(-INFINITY, INFINITY);
         float_double alpha = 1- exp(-eval);
         result = result + current_kernel.color * alpha * T;
         T = T * (1- alpha);

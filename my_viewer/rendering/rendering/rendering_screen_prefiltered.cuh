@@ -673,8 +673,13 @@ void render_screen_block_mix_selected_my_shared(point3d *screen, point3d src_,ro
         //ray_info_(src_, src, dir_, dir, middle_x, middle_y, width, height);
         src = ray_info_buffered_pixels_midles[block_id_x * gridDim.y + block_id_y].src;
         dir = ray_info_buffered_pixels_midles[block_id_x * gridDim.y + block_id_y].dir;
-        colored_gaussian_kernel_1D kernel = kernels[selected_kernels[i]].get_1D_kernel(dir, src);
-        shared_sorted_indexes[i] = index_value(selected_kernels[i], kernel.mu);
+        colored_gaussian_kernel_1D kernel = kernels[selected_kernels[i]].get_1D_kernel(dir_, src_);
+        if(kernel.mu<0){
+        shared_sorted_indexes[i] = index_value(selected_kernels[i], INFINITY);
+        }
+        else{
+            shared_sorted_indexes[i] = index_value(selected_kernels[i], kernel.mu);
+        }
     }
     __syncthreads();
     array_indexes_type kernel_block_size = n_kernels/block_size;

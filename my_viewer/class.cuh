@@ -29,7 +29,7 @@
 #define x_scaling 30
 #define y_scaling 30
 #define orthogonal false
-#define angle_1 false
+#define angle_1 true
 #define screen_dist 1.
 //#define rescaling_integral_1
 //#define rescaling_integral_2
@@ -714,7 +714,7 @@ class visual_gaussian_kernel{
         float_double6 precomputed_reoriented_sigma_inv = get_reoriented_sigma_inv(dir);
         //std::cout << "original sigma scales :" << kernel.scales3.x << " " << kernel.scales3.y << " " << kernel.scales3.z << " quaternions " << kernel.quaternions4.x << " " << kernel.quaternions4.y << " " << kernel.quaternions4.z << " " << kernel.quaternions4.w << std::endl;
         //std::cout << "reoriented sigma " << precomputed_reoriented_sigma_inv[0] << " " << precomputed_reoriented_sigma_inv[1] << " " << precomputed_reoriented_sigma_inv[2] << " " << precomputed_reoriented_sigma_inv[3] << " " << precomputed_reoriented_sigma_inv[4] << " " << precomputed_reoriented_sigma_inv[5] << std::endl;
-        float_double sigma_ = 1/(2*sqrt(precomputed_reoriented_sigma_inv[5]));
+        float_double sigma_ = 1/(sqrt(2*precomputed_reoriented_sigma_inv[5]));
         //std::cout << "original log_weight " << kernel.log_weight << std::endl;
         float_double log_weight_ = kernel.log_weight;
         point3d shifted_mu = kernel.mu;

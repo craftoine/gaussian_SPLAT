@@ -35,10 +35,16 @@ __host__ __device__ inline void get_bounding_rec_(point3d src_, rotation_matrix 
     eigen_vector2_x /= norm2;
     eigen_vector2_y /= norm2;
 
-    point3d centroid_min_x = g.kernel.mu-dir.transpose()*((point3d(eigen_vector1_x, eigen_vector1_y, 0)/sqrt(lambda1/2))*sqrt((-negligeable_val_when_exp+new_log_weight)));
+    /*point3d centroid_min_x = g.kernel.mu-dir.transpose()*((point3d(eigen_vector1_x, eigen_vector1_y, 0)/sqrt(lambda1/2))*sqrt((-negligeable_val_when_exp+new_log_weight)));
     point3d centroid_max_x = g.kernel.mu+dir.transpose()*((point3d(eigen_vector1_x, eigen_vector1_y, 0)/sqrt(lambda1/2))*sqrt((-negligeable_val_when_exp+new_log_weight)));
     point3d centroid_min_y = g.kernel.mu-dir.transpose()*((point3d(eigen_vector2_x, eigen_vector2_y, 0)/sqrt(lambda2/2))*sqrt((-negligeable_val_when_exp+new_log_weight)));
     point3d centroid_max_y = g.kernel.mu+dir.transpose()*((point3d(eigen_vector2_x, eigen_vector2_y, 0)/sqrt(lambda2/2))*sqrt((-negligeable_val_when_exp+new_log_weight)));
+    */
+    float_double max_lambda = min(lambda1, lambda2);
+    point3d centroid_min_x = g.kernel.mu-dir.transpose()*(point3d(1,0,0)*sqrt((-negligeable_val_when_exp+new_log_weight)/(max_lambda/2)));
+    point3d centroid_max_x = g.kernel.mu+dir.transpose()*(point3d(1,0,0)*sqrt((-negligeable_val_when_exp+new_log_weight)/(max_lambda/2)));
+    point3d centroid_min_y = g.kernel.mu-dir.transpose()*(point3d(0,1,0)*sqrt((-negligeable_val_when_exp+new_log_weight)/(max_lambda/2)));
+    point3d centroid_max_y = g.kernel.mu+dir.transpose()*(point3d(0,1,0)*sqrt((-negligeable_val_when_exp+new_log_weight)/(max_lambda/2)));
     float_double centroid_max_x_pixel_x, centroid_max_x_pixel_y, centroid_min_x_pixel_x, centroid_min_x_pixel_y, centroid_max_y_pixel_x, centroid_max_y_pixel_y, centroid_min_y_pixel_x, centroid_min_y_pixel_y;
     //get the screen coordinates of the centroids min / max x/y
     get_point_nearest_screen_cord_(src_, dir_, centroid_min_x_pixel_x, centroid_min_x_pixel_y, centroid_min_x, width, height);
