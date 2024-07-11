@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <stack>
+
 void random_unitary_quaternion(float_double* q){
     float_double d = 0;
     for(dimension_type i=0;i<4;i++){

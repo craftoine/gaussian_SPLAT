@@ -15,8 +15,9 @@
 #define SH_C3_5 1.445305721320277f
 #define SH_C3_6 -0.5900435899266435f
 
-#include "../knn_gaussian/construct_tree/construct.hpp"
-#include "../knn_gaussian/common_header.hpp"
+#include "../common/common_define.hpp"
+#include "../common/common_class.hpp"
+#include "../common/common_header.hpp"
 #define stop_T 0.0001
 #define k_steps 10
 #define k_steps_2 (10*k_steps)

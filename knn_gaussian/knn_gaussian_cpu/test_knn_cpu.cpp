@@ -1,6 +1,6 @@
 //knn with gaussian like kernel
 #include "../construct_tree/construct.hpp"
-#include "../common_header.hpp"
+#include "../../common/common_header.hpp"
 #include "def_functions.hpp"
 int main(){
     array_indexes_type N = 1774942;

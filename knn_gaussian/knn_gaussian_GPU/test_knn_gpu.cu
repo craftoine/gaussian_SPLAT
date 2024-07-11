@@ -1,6 +1,6 @@
 #define _USE_CUDA_
 #include "../construct_tree/construct.hpp"
-#include "../common_header.hpp"
+#include "../../common/common_header.hpp"
 #include "def_functions.cuh"
 #define Sort
 int main(){
