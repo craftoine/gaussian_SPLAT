@@ -88,27 +88,6 @@ class kdtree_node3{
         this->range7 = ranges7;
     }
 
-
-    //first values are left index and it's ranges
-/* BROKEN    kdtree_node3* left(){
-        const unsigned char size_index = sizeof(array_indexes_type)/sizeof(unsigned char);
-        array_indexes_type left_index = ((array_indexes_type*)data)[0];
-        const unsigned char range_size = (3+3+1+1)*sizeof(float_double)/sizeof(unsigned char);
-        const unsigned char ofset = size_index + range_size;
-        array_indexes_type right_index = ((array_indexes_type*)(data+ofset))[0];
-        float_double* ranges = (float_double*)(data+size_index);
-        return new kdtree_node3(right_index-left_index,data+left_index, ranges[0], ranges[1], ranges[2], ranges[3], ranges[4], ranges[5], ranges[6], ranges[7]);
-    }
-    
-    //next values are right index and it's ranges
-    kdtree_node3* right(){
-        const unsigned char size_index = sizeof(array_indexes_type)/sizeof(unsigned char);
-        const unsigned char range_size = (3+3+1+1)*sizeof(float_double)/sizeof(unsigned char);
-        const unsigned char ofset = size_index + range_size;
-        array_indexes_type right_index = ((array_indexes_type*)(data+ofset))[0];
-        float_double* ranges = (float_double*)(data+ofset+size_index);
-        return new kdtree_node3(size-right_index,data+right_index, ranges[0], ranges[1], ranges[2], ranges[3], ranges[4], ranges[5], ranges[6], ranges[7]);
-    }*/
     kdtree_node3(){
         size = 0;
         data = nullptr;
@@ -188,28 +167,6 @@ class kdtree_node3{
                 array_indexes_type size = sizeof(node) + left.size + right.size;
                 //char* data = (char*)malloc(size);
                 char* data = new char[size];
-                /*const unsigned char size_local = 2*sizeof(array_indexes_type)/sizeof(unsigned char) + 2*(3+3+1+1)*sizeof(float_double)/sizeof(unsigned char);
-                ((array_indexes_type*)data)[0] = size_local;
-                const unsigned char ofset1 = sizeof(array_indexes_type)/sizeof(char);
-                ((float_double*)(data+ofset1))[0] = left.range0;
-                ((float_double*)(data+ofset1))[1] = left.range1;
-                ((float_double*)(data+ofset1))[2] = left.range2;
-                ((float_double*)(data+ofset1))[3] = left.range3;
-                ((float_double*)(data+ofset1))[4] = left.range4;
-                ((float_double*)(data+ofset1))[5] = left.range5;
-                ((float_double*)(data+ofset1))[6] = left.range6;
-                ((float_double*)(data+ofset1))[7] = left.range7;
-                const unsigned char ofset2 = ofset1 +(3+3+1+1)*sizeof(float_double)/sizeof(char);
-                ((array_indexes_type*)(data+ofset2))[0] = size_local+left.size;
-                const unsigned char ofset3 = ofset2 + sizeof(array_indexes_type)/sizeof(char);
-                ((float_double*)(data+ofset3))[0] = right.range0;
-                ((float_double*)(data+ofset3))[1] = right.range1;
-                ((float_double*)(data+ofset3))[2] = right.range2;
-                ((float_double*)(data+ofset3))[3] = right.range3;
-                ((float_double*)(data+ofset3))[4] = right.range4;
-                ((float_double*)(data+ofset3))[5] = right.range5;
-                ((float_double*)(data+ofset3))[6] = right.range6;
-                ((float_double*)(data+ofset3))[7] = right.range7;*/
                 const unsigned char size_local = sizeof(node);
                 ((node *) data)->left_range.range0 = left.range0;
                 ((node *) data)->left_range.range1 = left.range1;
@@ -320,28 +277,7 @@ class kdtree_node3{
         //array_indexes_type size = 2*sizeof(array_indexes_type)/sizeof(char)+2*(3+3+1+1)*sizeof(float_double)/sizeof(char) + left.size + right.size;
         array_indexes_type size = sizeof(node) + left.size + right.size;
         char* data = new char[size];
-        /*const unsigned char size_local = 2*sizeof(array_indexes_type)/sizeof(unsigned char) + 2*(3+3+1+1)*sizeof(float_double)/sizeof(unsigned char);
-        ((array_indexes_type*)data)[0] = size_local;
-        const unsigned char ofset1 = sizeof(array_indexes_type)/sizeof(char);
-        ((float_double*)(data+ofset1))[0] = left.range0;
-        ((float_double*)(data+ofset1))[1] = left.range1;
-        ((float_double*)(data+ofset1))[2] = left.range2;
-        ((float_double*)(data+ofset1))[3] = left.range3;
-        ((float_double*)(data+ofset1))[4] = left.range4;
-        ((float_double*)(data+ofset1))[5] = left.range5;
-        ((float_double*)(data+ofset1))[6] = left.range6;
-        ((float_double*)(data+ofset1))[7] = left.range7;
-        const unsigned char ofset2 = ofset1 +(3+3+1+1)*sizeof(float_double)/sizeof(char);
-        ((array_indexes_type*)(data+ofset2))[0] = size_local+left.size;
-        const unsigned char ofset3 = ofset2 + sizeof(array_indexes_type)/sizeof(char);
-        ((float_double*)(data+ofset3))[0] = right.range0;
-        ((float_double*)(data+ofset3))[1] = right.range1;
-        ((float_double*)(data+ofset3))[2] = right.range2;
-        ((float_double*)(data+ofset3))[3] = right.range3;
-        ((float_double*)(data+ofset3))[4] = right.range4;
-        ((float_double*)(data+ofset3))[5] = right.range5;
-        ((float_double*)(data+ofset3))[6] = right.range6;
-        ((float_double*)(data+ofset3))[7] = right.range7;*/
+
         const unsigned char size_local = sizeof(node);
         ((node *) data)->left_range.range0 = left.range0;
         ((node *) data)->left_range.range1 = left.range1;

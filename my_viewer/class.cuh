@@ -1,5 +1,7 @@
 #define _USE_CUDA_
+
 #define M_PI 3.14159265358979323846
+// set sperical harmonic coefficients (same as in the gaussian splatting paper)
 #define SH_C0 0.28209479177387814f
 #define SH_C1 0.4886025119029199f
 #define SH_C2_0 1.0925484305920792f
@@ -619,7 +621,7 @@ class visual_gaussian_kernel{
                 d.x = d.x/n;
                 d.y = d.y/n;
                 d.z = d.z/n;
-                color.to_rgb(result, d, 0);
+                color.to_rgb(result, d, 3);
                 #ifdef can_buffer_color
                     rgb_buffer = result;
                 #endif
@@ -710,57 +712,22 @@ class visual_gaussian_kernel{
         }
     #endif
     __host__ __device__ inline colored_gaussian_kernel_1D get_1D_kernel(rotation_matrix dir, point3d src,bool debug = false){
-        //to do it corectely later
         point3d color = (*this).get_rgb(src);
         float_double6 precomputed_reoriented_sigma_inv = get_reoriented_sigma_inv(dir);
-        //std::cout << "original sigma scales :" << kernel.scales3.x << " " << kernel.scales3.y << " " << kernel.scales3.z << " quaternions " << kernel.quaternions4.x << " " << kernel.quaternions4.y << " " << kernel.quaternions4.z << " " << kernel.quaternions4.w << std::endl;
-        //std::cout << "reoriented sigma " << precomputed_reoriented_sigma_inv[0] << " " << precomputed_reoriented_sigma_inv[1] << " " << precomputed_reoriented_sigma_inv[2] << " " << precomputed_reoriented_sigma_inv[3] << " " << precomputed_reoriented_sigma_inv[4] << " " << precomputed_reoriented_sigma_inv[5] << std::endl;
         float_double sigma_ = 1/(sqrt(2*precomputed_reoriented_sigma_inv[5]));
-        //std::cout << "original log_weight " << kernel.log_weight << std::endl;
         float_double log_weight_ = kernel.log_weight;
         point3d shifted_mu = kernel.mu;
         shifted_mu.x = shifted_mu.x - src.x;
         shifted_mu.y = shifted_mu.y - src.y;
         shifted_mu.z = shifted_mu.z - src.z;
         shifted_mu = dir*shifted_mu;
-        //printf("shifted_mu %f %f %f\n", shifted_mu.x, shifted_mu.y, shifted_mu.z);
-    //    log_weight_ -= precomputed_reoriented_sigma_inv[0]*shifted_mu.x*shifted_mu.x;
-        //std::cout << "log_weight_ a " << log_weight_ << std::endl;
-    //    log_weight_ -= precomputed_reoriented_sigma_inv[3]*shifted_mu.y*shifted_mu.y;
-        //std::cout << "log_weight_ b " << log_weight_ << std::endl;
-    //    log_weight_ -= 2*precomputed_reoriented_sigma_inv[1]*shifted_mu.x*shifted_mu.y;
-        //std::cout << "log_weight_ c " << log_weight_ << std::endl;
-        //log_weight_ -= 2*precomputed_reoriented_sigma_inv[2]*shifted_mu.x*shifted_mu.z;
-        //std::cout << "log_weight_ d " << log_weight_ << std::endl;
-        //log_weight_ -= 2*precomputed_reoriented_sigma_inv[4]*shifted_mu.y*shifted_mu.z;
-        //std::cout << "log_weight_ e " << log_weight_ << std::endl;
-    //    log_weight_ += (precomputed_reoriented_sigma_inv[2]*precomputed_reoriented_sigma_inv[2]/(precomputed_reoriented_sigma_inv[5]))*shifted_mu.x*shifted_mu.x;
-        //std::cout << "log_weight_ f " << log_weight_ << std::endl;
-    //    log_weight_ += (precomputed_reoriented_sigma_inv[4]*precomputed_reoriented_sigma_inv[4]/(precomputed_reoriented_sigma_inv[5]))*shifted_mu.y*shifted_mu.y;
-        //std::cout << "log_weight_ g " << log_weight_ << std::endl;
-    //    log_weight_ += 2*(precomputed_reoriented_sigma_inv[2]*precomputed_reoriented_sigma_inv[4]/(precomputed_reoriented_sigma_inv[5]))*shifted_mu.x*shifted_mu.y;
-        //std::cout << "log_weight_ h " << log_weight_ << std::endl;
-        //log_weight_ += 2*precomputed_reoriented_sigma_inv[2]*shifted_mu.x*shifted_mu.z;
-        //std::cout << "log_weight_ i " << log_weight_ << std::endl;
-        //log_weight_ += 2*precomputed_reoriented_sigma_inv[4]*shifted_mu.y*shifted_mu.z;
-        //std::cout << "log_weight_ " << log_weight_ << std::endl;
-        //std::cout << "sigma_ " << sigma_ << std::endl;
-
-        //compute log_weight_ an other way
         float_double6 precomputed_reoriented_sigma = get_reoriented_sigma(dir);
         float_double inv_det = 1/(precomputed_reoriented_sigma[0]*precomputed_reoriented_sigma[3] - precomputed_reoriented_sigma[1]*precomputed_reoriented_sigma[1]);
         float_double xx = precomputed_reoriented_sigma[3]*inv_det;
         float_double yy = precomputed_reoriented_sigma[0]*inv_det;
         float_double xy = -precomputed_reoriented_sigma[1]*inv_det;
         log_weight_ = kernel.log_weight - 0.5*(xx*shifted_mu.x*shifted_mu.x + yy*shifted_mu.y*shifted_mu.y + 2*xy*shifted_mu.x*shifted_mu.y);
-
-
-
-
-
         float_double mu_ = shifted_mu.z +(shifted_mu.x*precomputed_reoriented_sigma_inv[2] + shifted_mu.y*precomputed_reoriented_sigma_inv[4])/precomputed_reoriented_sigma_inv[5];
-        //std::cout << "mu_ " << mu_ << std::endl;
-        //free(precomputed_reoriented_sigma_inv);
         return colored_gaussian_kernel_1D(color, sigma_, log_weight_,mu_);
     }
 };
