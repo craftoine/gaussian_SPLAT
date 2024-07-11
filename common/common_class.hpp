@@ -504,46 +504,23 @@ gaussian_kernel2_3D{
         //R^-1 = R^T
 
         point3d x_mu = x - mu;
-        //point3d R_inv_x_mu;
-        /*float_double R00 = 1-2*quaternions4.z*quaternions4.z-2*quaternions4.w*quaternions4.w;
-        float_double R01 = 2*quaternions4.y*quaternions4.z-2*quaternions4.x*quaternions4.w;
-        float_double R02 = 2*quaternions4.x*quaternions4.z+2*quaternions4.y*quaternions4.w;
-        R_inv_x_mu.x = R00*x_mu.x + R01*x_mu.y + R02*x_mu.z;
-        float_double R10 = 2*quaternions4.y*quaternions4.z+2*quaternions4.x*quaternions4.w;
-        float_double R11 = 1-2*quaternions4.y*quaternions4.y-2*quaternions4.w*quaternions4.w;
-        float_double R12 = 2*quaternions4.z*quaternions4.w-2*quaternions4.x*quaternions4.y;
-        R_inv_x_mu.y = R10*x_mu.x + R11*x_mu.y + R12*x_mu.z;
-        float_double R20 = 2*quaternions4.y*quaternions4.w-2*quaternions4.x*quaternions4.z;
-        float_double R21 = 2*quaternions4.x*quaternions4.y+2*quaternions4.z*quaternions4.w;
-        float_double R22 = 1-2*quaternions4.y*quaternions4.y-2*quaternions4.z*quaternions4.z;
-        R_inv_x_mu.z = R20*x_mu.x + R21*x_mu.y + R22*x_mu.z;*/
         point3d scale_inv_R_inv_x_mu;
         
         scale_inv_R_inv_x_mu.x = ((1-2*quaternions4.z*quaternions4.z-2*quaternions4.w*quaternions4.w)*x_mu.x + (2*quaternions4.y*quaternions4.z-2*quaternions4.x*quaternions4.w)*x_mu.y + (2*quaternions4.x*quaternions4.z+2*quaternions4.y*quaternions4.w)*x_mu.z)/scales3.x;
         scale_inv_R_inv_x_mu.y = ((2*quaternions4.y*quaternions4.z+2*quaternions4.x*quaternions4.w)*x_mu.x + (1-2*quaternions4.y*quaternions4.y-2*quaternions4.w*quaternions4.w)*x_mu.y + (2*quaternions4.z*quaternions4.w-2*quaternions4.x*quaternions4.y)*x_mu.z)/scales3.y;
         scale_inv_R_inv_x_mu.z = ((2*quaternions4.y*quaternions4.w-2*quaternions4.x*quaternions4.z)*x_mu.x + (2*quaternions4.x*quaternions4.y+2*quaternions4.z*quaternions4.w)*x_mu.y + (1-2*quaternions4.y*quaternions4.y-2*quaternions4.z*quaternions4.z)*x_mu.z)/scales3.z;
         float_double res = scale_inv_R_inv_x_mu.square_norm();
-        //scale_inv_R_inv_x_mu.x = R_inv_x_mu.x/scales3.x;
-        //scale_inv_R_inv_x_mu.y = R_inv_x_mu.y/scales3.y;
-        //scale_inv_R_inv_x_mu.z = R_inv_x_mu.z/scales3.z;
-        return log_weight - /*scale_inv_R_inv_x_mu.square_norm()/2;*/res/2;
+        return log_weight - res/2;
     }
     #ifdef _USE_CUDA_ 
     __host__ __device__
     #endif
     inline float_double distance(point3d x){
-        //if the kernel does not have weight infinit
-        //if(!(std::isinf(log_weight))){
         #ifdef __CUDA_ARCH__
             return -max(this->operator()(x), negligeable_val_when_exp);
         #else
             return -std::max(this->operator()(x), negligeable_val_when_exp);
         #endif
-        //}
-        //else{
-            //return minimum value of a float_double
-            //return -max_float_double;
-        //}
     }
     gaussian_kernel2_1D convert(){
         float_double max_eigan = std::max(scales3.x*scales3.x, std::max(scales3.y*scales3.y, scales3.z*scales3.z));
