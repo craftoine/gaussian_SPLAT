@@ -89,7 +89,6 @@ plt.plot(x,[gm(x_)[1] for x_ in x],label='green mixture', color = 'green')
 plt.plot(x,[gm(x_)[2] for x_ in x],label='blue mixture', color = 'blue')
 plt.plot(x,[gm.call2(x_) for x_ in x],label='opacity mixture', color = 'black')
 plt.xlabel('x')
-plt.ylabel('y')
 plt.title('Gaussian Mixture value')
 plt.legend()
 plt.show()
@@ -97,7 +96,6 @@ plt.plot(x,[f_0(x_) for x_ in x],label='transmitance multiplied by red mixture',
 plt.plot(x,[f_1(x_) for x_ in x],label='transmitance multiplied by green mixture', color = 'green')
 plt.plot(x,[f_2(x_) for x_ in x],label='transmitance multiplied by blue mixture', color = 'blue')
 plt.xlabel('x')
-plt.ylabel('y')
 plt.title('values to integrate')
 plt.legend()
 plt.show()
@@ -107,9 +105,9 @@ k = 10
 K = k
 #compute the integral of f1,f2,f3 and plot them value
 x = np.linspace(start,end,300)
-plt.plot(x,[quad(f_0,start,x_)[0] for x_ in x],label='red true', color = 'red')
-plt.plot(x,[quad(f_1,start,x_)[0] for x_ in x],label='green true', color = 'green')
-plt.plot(x,[quad(f_2,start,x_)[0] for x_ in x],label='blue true', color = 'blue')
+plt.plot(x,[quad(f_0,start,x_)[0] for x_ in x],label='red true', color = 'lightcoral',alpha=0.7,linestyle='solid',linewidth=4)
+plt.plot(x,[quad(f_1,start,x_)[0] for x_ in x],label='green true', color = 'lightgreen',alpha=0.7,linestyle='solid',linewidth=4)
+plt.plot(x,[quad(f_2,start,x_)[0] for x_ in x],label='blue true', color = 'lightblue',alpha=0.7,linestyle='solid',linewidth=4)
 
 def bad_integration_method(gm,start,end):
     l = []
@@ -331,7 +329,8 @@ print("my error no rescaling 2 blue",errors_2[K-1][2])
 
 #compute the error according to negligeable_val_when_exp
 k = K
-negligeable_vals = [-x/50 for x in range(150,500)]
+#negligeable_vals = [-x/50 for x in range(150,500)]
+negligeable_vals = np.linspace(-10,0,1000)
 errors = []
 errors_1 = []
 errors_2 = []
@@ -347,7 +346,8 @@ for n in negligeable_vals:
     rescaling = 1
     #x,y = my_integration_method(gm,start,end,k)
     _y = my_integration_method_(gm,start,end,k)
-    errors_1.append([np.abs(y[len(y)-1][i]-true_values[i])/true_values[i] for i in range(3)])
+    #errors_1.append([np.abs(y[len(y)-1][i]-true_values[i])/true_values[i] for i in range(3)])
+    errors_1.append([np.abs(_y[i]-true_values[i])/true_values[i] for i in range(3)])
     rescaling = 2
     #x,y = my_integration_method(gm,start,end,k)
     _y = my_integration_method_(gm,start,end,k)

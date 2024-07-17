@@ -25,13 +25,13 @@
 #define k_steps_2 (10*k_steps)
 #define min_sum_eval 0.0001
 #define rendering_block_size 16
-#define reordering_window_size 30
-#define max_overlap 7
+#define reordering_window_size 50
+#define max_overlap 10
 #define background_color point3d(0, 0, 0)
 #define fov 60.
-#define x_scaling 30
-#define y_scaling 30
-#define orthogonal false
+#define x_scaling 3
+#define y_scaling 3
+#define orthogonal true
 #define angle_1 true
 #define screen_dist 1.
 //#define rescaling_integral_1

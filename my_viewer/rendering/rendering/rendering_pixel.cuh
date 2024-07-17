@@ -401,10 +401,12 @@ point3d render_pixel_mix_block(rotation_matrix dir, point3d src, visual_gaussian
         /*if(current_kernel.mu < 0){
             continue;
         }*/
+        if(b>a){
         float_double eval = current_kernel.get_integral(-INFINITY, INFINITY);
         float_double alpha = 1- exp(-eval);
         result = result + current_kernel.color * alpha * T;
         T = T * (1- alpha);
+        }
         /*if(threadIdx.x ==0 && threadIdx.y == 0){
             printf("block_x %d block_y %d curent_kernel %d log_weight %f\n", blockIdx.x, blockIdx.y, sorted_indexes[i].index, current_kernel.log_weight);
         }*/
