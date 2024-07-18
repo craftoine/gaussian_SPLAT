@@ -191,7 +191,7 @@ int main(){
         end_header
     */
     
-    std::vector<visual_gaussian_kernel> v_kernels_true;
+    /*std::vector<visual_gaussian_kernel> v_kernels_true;
     //std::ifstream infile3("../knn_gaussian/knn_gaussian_cpu/input.ply", std::ios::binary);
     std::ifstream infile3("point_cloud.ply", std::ios::binary);
     // "Parse" header (it has to be a specific format anyway)
@@ -265,8 +265,8 @@ int main(){
         opacity = log(opacity);*/
         //opacity = 0;
 
-        //create scale and quaternion vectors
-        float_double scale[3];
+        //create scale and quaternion vectors*/
+        /*float_double scale[3];
         scale[0] = (float_double) scale_0;
         scale[1] = (float_double) scale_1;
         scale[2] = (float_double) scale_2;
@@ -281,7 +281,7 @@ int main(){
         mu.x = (float_double)x;
         mu.y = (float_double)y;
         mu.z = (float_double)z;
-
+*/
 
         //float_double det = scale[0]*scale[1]*scale[2]*scale[0]*scale[1]*scale[2];
         //opacity += log(sqrt(pow((2*M_PI),3)*det));
@@ -302,7 +302,7 @@ int main(){
         //opacity += -log(sqrt(2*M_PI)*min_sig);
         //opacity = log(-log(1-opacity)/sqrt(2*M_PI*min_sig));
         
-        gaussian_kernel2_3D kernel(mu, opacity, scale, q);
+   /*     gaussian_kernel2_3D kernel(mu, opacity, scale, q);
 
         visual_gaussian_kernel v_kernel(kernel, sh_color);
         v_kernels_true.push_back(v_kernel);
@@ -316,7 +316,7 @@ int main(){
     
     //print first kernel
     std::cout << "first kernel: " << v_kernels[5000].kernel << std::endl;
-
+*/
 
 
 
